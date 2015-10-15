@@ -3,7 +3,6 @@
 var map;
 var layer;
 var cursors;
-var jumpButton;
 var runButton;
 var result;
 
@@ -22,7 +21,7 @@ var game = new Phaser.Game(600, 256, Phaser.AUTO, 'game', {
 
 function preload() {
     game.load.tilemap('objects', 'assets/maps/map1-1.json', null, Phaser.Tilemap.TILED_JSON);
-    game.load.image('tiles', 'assets/sprites/items.png');
+    game.load.image('tiles', 'assets/tilesets/items.png');
     game.load.spritesheet('mario', 'assets/sprites/mario-small.png', 34, 34, 7);
 }
 
@@ -74,62 +73,19 @@ function create() {
 
     game.camera.follow(mario.sprite);
     cursors = game.input.keyboard.createCursorKeys();
-    jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     runButton = game.input.keyboard.addKey(Phaser.Keyboard.SHIFT);
 };
-
 
 function update() {
     game.physics.arcade.collide(mario.sprite, layer);
     mario.doNothing = true;
     if (cursors.left.isDown) {
-        if (mario.direction != 'left') {
-            mario.sprite.scale.x *= -1;
-            mario.direction = 'left';
-        }
-        if (mario.sprite.body.velocity.x == 0 ||
-            (mario.sprite.animations.currentAnim.name != 'left' && mario.sprite.body.onFloor())) {
-            mario.sprite.animations.play('left', 10, true);
-        }
-
-        mario.sprite.body.velocity.x -= 5;
-        if (runButton.isDown) {
-            if (mario.sprite.body.velocity.x < -200) {
-                mario.sprite.body.velocity.x = -200;
-            }
-        } else {
-            if (mario.sprite.body.velocity.x < -120) {
-                mario.sprite.body.velocity.x = -120;
-            }
-        }
-        mario.doNothing = false;
+        moveMarioLeft();
     } else if (cursors.right.isDown) {
-        if (mario.direction != 'right') {
-            mario.sprite.scale.x *= -1;
-            mario.direction = 'right';
-        }
-        if (mario.sprite.body.velocity.x == 0 ||
-            (mario.sprite.animations.currentAnim.name != 'left' && mario.sprite.body.onFloor())) {
-            mario.sprite.animations.play('left', 10, true);
-        }
-        mario.sprite.body.velocity.x += 5;
-        if (runButton.isDown) {
-            if (mario.sprite.body.velocity.x > 200) {
-                mario.sprite.body.velocity.x = 200;
-            }
-        } else {
-            if (mario.sprite.body.velocity.x > 120) {
-                mario.sprite.body.velocity.x = 120;
-            }
-        }
-        mario.doNothing = false;
+        moveMarioRight();
     }
     if (cursors.up.justDown) {
-        if (mario.sprite.body.onFloor()) {
-            mario.sprite.body.velocity.y = -310;
-            mario.sprite.animations.play('jump', 20, true);
-            mario.doNothing = false;
-        }
+        jump();
     }
     if (mario.doNothing) {
         if (mario.sprite.body.velocity.x > 10) {
@@ -151,4 +107,57 @@ function update() {
 
 function render() {
     //game.debug.bodyInfo(mario.sprite, 32, 32);
+}
+
+function moveMarioLeft (argument) {
+    if (mario.direction != 'left') {
+        mario.sprite.scale.x *= -1;
+        mario.direction = 'left';
+    }
+    if (mario.sprite.body.velocity.x == 0 ||
+        (mario.sprite.animations.currentAnim.name != 'left' && mario.sprite.body.onFloor())) {
+        mario.sprite.animations.play('left', 10, true);
+    }
+
+    mario.sprite.body.velocity.x -= 5;
+    if (runButton.isDown) {
+        if (mario.sprite.body.velocity.x < -200) {
+            mario.sprite.body.velocity.x = -200;
+        }
+    } else {
+        if (mario.sprite.body.velocity.x < -120) {
+            mario.sprite.body.velocity.x = -120;
+        }
+    }
+    mario.doNothing = false;
+}
+
+function moveMarioRight () {
+    if (mario.direction != 'right') {
+        mario.sprite.scale.x *= -1;
+        mario.direction = 'right';
+    }
+    if (mario.sprite.body.velocity.x == 0 ||
+        (mario.sprite.animations.currentAnim.name != 'left' && mario.sprite.body.onFloor())) {
+        mario.sprite.animations.play('left', 10, true);
+    }
+    mario.sprite.body.velocity.x += 5;
+    if (runButton.isDown) {
+        if (mario.sprite.body.velocity.x > 200) {
+            mario.sprite.body.velocity.x = 200;
+        }
+    } else {
+        if (mario.sprite.body.velocity.x > 120) {
+            mario.sprite.body.velocity.x = 120;
+        }
+    }
+    mario.doNothing = false;
+}
+
+function jump () {
+    if (mario.sprite.body.onFloor()) {
+        mario.sprite.body.velocity.y = -310;
+        mario.sprite.animations.play('jump', 20, true);
+        mario.doNothing = false;
+    }
 }
